@@ -1,8 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using N2.Persistence;
 
 namespace N2.Persistence
 {
@@ -10,7 +9,7 @@ namespace N2.Persistence
 	{
 		public ParameterCollection()
 		{
-			Operator = Persistence.Operator.And;
+			Operator = Operator.And;
 		}
 
 		public ParameterCollection(Operator op)
@@ -18,21 +17,21 @@ namespace N2.Persistence
 			Operator = op;
 		}
 
-		public ParameterCollection(params IParameter[] parameters)
+/*		public ParameterCollection(params IParameter[] parameters)
 			: this(Operator.And)
 		{
-			Operator = Persistence.Operator.And;
+			Operator = Operator.And;
 			this.parameters.AddRange(parameters);
-		}
+		}*/
 
 		public ParameterCollection(IEnumerable<IParameter> parameters)
 			: this(Operator.And)
 		{
-			Operator = Persistence.Operator.And;
+			Operator = Operator.And;
 			this.parameters.AddRange(parameters);
 		}
 
-		List<IParameter> parameters = new List<IParameter>();
+	    readonly List<IParameter> parameters = new List<IParameter>();
 
 		public Operator Operator { get; set; }
 
@@ -79,7 +78,7 @@ namespace N2.Persistence
 			return parameters.GetEnumerator();
 		}
 
-		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return GetEnumerator();
 		}
@@ -87,16 +86,16 @@ namespace N2.Persistence
 
 		public static ParameterCollection operator &(ParameterCollection q1, IParameter q2)
 		{
-			return new ParameterCollection(Persistence.Operator.And) { { q1 }, { q2 } };
+			return new ParameterCollection(Operator.And) { q1, q2};
 		}
 		public static ParameterCollection operator |(ParameterCollection q1, IParameter q2)
 		{
-			return new ParameterCollection(Persistence.Operator.Or) { { q1 }, { q2 } };
+			return new ParameterCollection(Operator.Or) { q1, q2};
 		}
 
 		public bool IsMatch(object item)
 		{
-			if (Operator == Persistence.Operator.And)
+			if (Operator == Operator.And)
 				return this.All(p => p.IsMatch(item));
 
 			return this.Any(p => p.IsMatch(item));
@@ -104,19 +103,19 @@ namespace N2.Persistence
 
 		public ParameterCollection OrderBy(string expression)
 		{
-			this.Order = new Order(expression);
+			Order = new Order(expression);
 			return this;
 		}
 
 		public ParameterCollection Skip(int skip)
 		{
-			this.Range = new Range(skip, Range != null ? Range.Take : 0);
+			Range = new Range(skip, Range != null ? Range.Take : 0);
 			return this;
 		}
 
 		public ParameterCollection Take(int take)
 		{
-			this.Range = new Range(Range != null ? Range.Skip : 0, take);
+			Range = new Range(Range != null ? Range.Skip : 0, take);
 			return this;
 		}
 
@@ -125,7 +124,7 @@ namespace N2.Persistence
 
 		public override string ToString()
 		{
-			return string.Join((Operator == Persistence.Operator.And ? " & " : " | "), parameters.Select(p => p.ToString()))
+			return string.Join((Operator == Operator.And ? " & " : " | "), parameters.Select(p => p.ToString()))
 				+ (Range == null ? "" : (" (" + Range.Skip + " - " + (Range.Skip + Range.Take)) + ")")
 				+ (Order == null ? "" : (" (by " + Order.Property + (Order.Descending ? " DESC" : "")) + ")");
 		}

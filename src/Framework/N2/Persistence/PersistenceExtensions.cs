@@ -19,17 +19,17 @@ namespace N2.Persistence
 
 		public static ParameterCollection Skip(this Parameter parameter, int skip)
 		{
-			return new ParameterCollection(parameter).Skip(skip);
+			return (new ParameterCollection(parameter)).Skip(skip);
 		}
 
 		public static ParameterCollection Take(this Parameter parameter, int take)
 		{
-			return new ParameterCollection(parameter).Take(take);
+			return (new ParameterCollection(parameter)).Take(take);
 		}
 
 		public static ParameterCollection OrderBy(this Parameter parameter, string expression)
 		{
-			return new ParameterCollection(parameter).OrderBy(expression);
+			return (new ParameterCollection(parameter)).OrderBy(expression);
 		}
 
 		/// <summary>
@@ -62,12 +62,6 @@ namespace N2.Persistence
 					repository.SaveOrUpdate(entity);
 				tx.Commit();
 			}
-		}
-
-		[Obsolete("Use SaveOrUpdate(ContentItem)")]
-		public static void Save(this IRepository<ContentItem> repository, ContentItem entity)
-		{
-			repository.SaveOrUpdate(entity);
 		}
 
 		/// <summary>
@@ -144,7 +138,7 @@ namespace N2.Persistence
 		{
 			if (parent.ChildState != Collections.CollectionState.IsEmpty)
 			{
-				foreach (var child in parent.Children)
+				foreach (var child in parent.Children.ToList())
 				{
 					DeleteChildrenRecursive(repository, child);
 				}

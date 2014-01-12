@@ -102,7 +102,7 @@ namespace N2.Collections
 		/// <returns></returns>
 		public IEnumerable<ContentItem> Children()
 		{
-			return Children(null);
+			return Children(CurrentItem, DefaultFilter);
 		}
 
 		/// <summary>Children of the current item.</summary>
@@ -364,8 +364,7 @@ namespace N2.Collections
 		{
 			if (path == null)
 				return null;
-			var g = (startItem ?? engine().UrlParser.StartPage);
-			return g == null ? null : g.FindPath(path);
+			return (startItem ?? engine().UrlParser.StartPage).FindPath(path);
 		}
 
 		/// <summary>Gets the item at of the specified type.</summary>

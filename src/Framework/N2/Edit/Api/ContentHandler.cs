@@ -193,7 +193,8 @@ namespace N2.Management.Api
         private IEnumerable<TreeNode> GetAncestors(HttpContextBase context)
         {
             var root = Selection.ParseSelected(context.Request["root"]) ?? Selection.Traverse.RootPage;
-            return Selection.Traverse.Ancestors(filter: engine.EditManager.GetEditorFilter(context.User), lastAncestor: root).Select(ci => engine.ResolveAdapter<NodeAdapter>(ci).GetTreeNode(ci)).ToList();
+            return Selection.Traverse.Ancestors(null, engine.EditManager.GetEditorFilter(context.User), lastAncestor: root).
+				Select(ci => engine.ResolveAdapter<NodeAdapter>(ci).GetTreeNode(ci)).ToList();
         }
 
         private Node<TreeNode> GetBranch(HttpContextBase context)
