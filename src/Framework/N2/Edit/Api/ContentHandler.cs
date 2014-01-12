@@ -46,7 +46,7 @@ namespace N2.Management.Api
 
 		public void ProcessRequest(HttpContextBase context)
 		{
-			Authorize(context.User, Selection.SelectedItem);
+            Authorize(context.User, Selection.SelectedItem);
 
 			context.Response.SetNoCache();
 
@@ -81,41 +81,41 @@ namespace N2.Management.Api
 							return;
 						case "":
 						case "/":
-						case "/children":
+                        case "/children":
 							var children = GetChildren(context).ToList();
 							context.Response.WriteJson(new { Children = children, IsPaged = Selection.SelectedItem.ChildState.IsAny(CollectionState.IsLarge) });
 							return;
-						case "/branch":
+                        case "/branch":
 							var branch = GetBranch(context);
 							context.Response.WriteJson(new { Branch = branch });
 							return;
-						case "/tree":
+                        case "/tree":
 							var tree = GetTree(context);
 							context.Response.WriteJson(new { Tree = tree });
 							return;
-						case "/ancestors":
+                        case "/ancestors":
 							var ancestors = GetAncestors(context);
 							context.Response.WriteJson(new { Ancestors = ancestors });
 							return;
-						case "/parent":
+                        case "/parent":
 							var parent = GetParent(context);
 							context.Response.WriteJson(new { Parent = parent });
 							return;
-						case "/node":
+                        case "/node":
 							var node = GetNode(context);
 							context.Response.WriteJson(new { Node = node });
 							return;
 						default:
-							if (context.Request.PathInfo.StartsWith("/"))
-							{
-								int id;
-								if (int.TryParse(context.Request.PathInfo.Trim('/'), out id))
+								if (context.Request.PathInfo.StartsWith("/"))
 								{
-									var item = engine.Persister.Get(id);
-									context.Response.WriteJson(item);
-									return;
+									int id;
+									if (int.TryParse(context.Request.PathInfo.Trim('/'), out id))
+									{
+										var item = engine.Persister.Get(id);
+										context.Response.WriteJson(item);
+										return;
+									}
 								}
-							}
 							break;
 					}
 					break;
@@ -167,8 +167,8 @@ namespace N2.Management.Api
 							return;
 						case "/":
 						case "":
-							EnsureValidSelection();
-							Delete(context);
+					EnsureValidSelection();
+					Delete(context);
 							return;
 					}
 					break;
@@ -365,55 +365,56 @@ namespace N2.Management.Api
 			engine.Resolve<ManagementMessageCollector>().Delete(context.Request["source"], context.Request["id"]);
 		}
 
-		private void Authorize(IPrincipal user, ContentItem item)
-		{
-			if (!engine.SecurityManager.IsAuthorized(user, item, Security.Permission.Read))
-				throw new UnauthorizedAccessException();
-		}
+        private void Authorize(IPrincipal user, ContentItem item)
+        {
+            if (!engine.SecurityManager.IsAuthorized(user, item, Security.Permission.Read))
+                throw new UnauthorizedAccessException();
+        }
 
-		private void EnsureValidSelection()
-		{
-			if (Selection.ParseSelectionFromRequest() == null)
-				throw new HttpException(404, "Not Found");
-		}
+        private void EnsureValidSelection()
+        {
+            if (Selection.ParseSelectionFromRequest() == null)
+                throw new HttpException(404, "Not Found");
+        }
 
-		private Node<TreeNode> GetNode(HttpContextBase context)
-		{
-			return ApiExtensions.CreateNode(new HierarchyNode<ContentItem>(Selection.SelectedItem), engine.Resolve<IContentAdapterProvider>(), engine.EditManager.GetEditorFilter(context.User));
-		}
+        private Node<TreeNode> GetNode(HttpContextBase context)
+        {
+            return ApiExtensions.CreateNode(new HierarchyNode<ContentItem>(Selection.SelectedItem), engine.Resolve<IContentAdapterProvider>(), engine.EditManager.GetEditorFilter(context.User));
+        }
 
-		private Node<TreeNode> GetTree(HttpContextBase context)
-		{
-			var adapters = engine.Resolve<IContentAdapterProvider>();
-			var selectedItem = Selection.SelectedItem;
-			var filter = engine.EditManager.GetEditorFilter(context.User);
-			int maxDepth;
-			int.TryParse(context.Request["depth"], out maxDepth);
-			var structure = ApiExtensions.BuildTreeStructure(filter, adapters, selectedItem, maxDepth);
-			return ApiExtensions.CreateNode(structure, adapters, filter);
-		}
+        private Node<TreeNode> GetTree(HttpContextBase context)
+        {
+            var adapters = engine.Resolve<IContentAdapterProvider>();
+            var selectedItem = Selection.SelectedItem;
+            var filter = engine.EditManager.GetEditorFilter(context.User);
+            int maxDepth;
+            int.TryParse(context.Request["depth"], out maxDepth);
+            var structure = ApiExtensions.BuildTreeStructure(filter, adapters, selectedItem, maxDepth);
+            return ApiExtensions.CreateNode(structure, adapters, filter);
+        }
 
-		private TreeNode GetParent(HttpContextBase context)
-		{
-			var parent = Selection.SelectedItem.Parent;
-			Authorize(context.User, parent);
-			return engine.ResolveAdapter<NodeAdapter>(parent).GetTreeNode(parent);
-		}
+        private TreeNode GetParent(HttpContextBase context)
+        {
+            var parent = Selection.SelectedItem.Parent;
+            Authorize(context.User, parent);
+            return engine.ResolveAdapter<NodeAdapter>(parent).GetTreeNode(parent);
+        }
 
-		private IEnumerable<TreeNode> GetAncestors(HttpContextBase context)
-		{
-			var root = Selection.ParseSelected(context.Request["root"]) ?? Selection.Traverse.RootPage;
-			return Selection.Traverse.Ancestors(filter: engine.EditManager.GetEditorFilter(context.User), lastAncestor: root).Select(ci => engine.ResolveAdapter<NodeAdapter>(ci).GetTreeNode(ci)).ToList();
-		}
+        private IEnumerable<TreeNode> GetAncestors(HttpContextBase context)
+        {
+            var root = Selection.ParseSelected(context.Request["root"]) ?? Selection.Traverse.RootPage;
+            return Selection.Traverse.Ancestors(null, engine.EditManager.GetEditorFilter(context.User), lastAncestor: root).
+				Select(ci => engine.ResolveAdapter<NodeAdapter>(ci).GetTreeNode(ci)).ToList();
+        }
 
-		private Node<TreeNode> GetBranch(HttpContextBase context)
-		{
-			var root = Selection.ParseSelected(context.Request["root"]) ?? Selection.Traverse.RootPage;
-			var selectedItem = Selection.SelectedItem;
-			var filter = engine.EditManager.GetEditorFilter(context.User);
-			var structure = ApiExtensions.BuildBranchStructure(filter, engine.Resolve<IContentAdapterProvider>(), selectedItem, root);
-			return ApiExtensions.CreateNode(structure, engine.Resolve<IContentAdapterProvider>(), filter);
-		}
+        private Node<TreeNode> GetBranch(HttpContextBase context)
+        {
+            var root = Selection.ParseSelected(context.Request["root"]) ?? Selection.Traverse.RootPage;
+            var selectedItem = Selection.SelectedItem;
+            var filter = engine.EditManager.GetEditorFilter(context.User);
+            var structure = ApiExtensions.BuildBranchStructure(filter, engine.Resolve<IContentAdapterProvider>(), selectedItem, root);
+            return ApiExtensions.CreateNode(structure, engine.Resolve<IContentAdapterProvider>(), filter);
+        }
 
 		private IEnumerable<TokenDefinition> GetTokens(HttpContextBase context)
 		{
@@ -441,7 +442,7 @@ namespace N2.Management.Api
 
 			var discriminator = context.Request["discriminator"];
 			var definition = engine.Definitions.GetDefinition(discriminator);
-
+			
 			var item = engine.Resolve<ContentActivator>().CreateInstance(definition.ItemType, parent);
 
 			var requestBody = context.GetOrDeserializeRequestStreamJsonDictionary<object>();
@@ -471,7 +472,7 @@ namespace N2.Management.Api
 				try
 				{
 					node = new Node<TreeNode>(adapter.GetTreeNode(v.Content, allowDraft: false));
-				}
+		}
 				catch (Exception ex)
 				{
 					Logger.Error("Failure in GetVersions(HttpContextBase)", ex);
@@ -576,27 +577,27 @@ namespace N2.Management.Api
 
 			using (var tx = engine.Persister.Repository.BeginTransaction())
 			{
-				if (!string.IsNullOrEmpty(request("before")))
-				{
-					var before = engine.Resolve<Navigator>().Navigate(request("before"));
+			if (!string.IsNullOrEmpty(request("before")))
+			{
+				var before = engine.Resolve<Navigator>().Navigate(request("before"));
 
-					PerformMoveChecks(context, from, before.Parent);
-
-					if (!string.IsNullOrEmpty(request("zone")))
-						from.ZoneName = request("zone");
-					sorter.MoveTo(from, NodePosition.Before, before);
-				}
-				else
-				{
-					var to = engine.Resolve<Navigator>().Navigate(request("to"));
-
-					PerformMoveChecks(context, from, to);
+				PerformMoveChecks(context, from, before.Parent);
 
 					if (!string.IsNullOrEmpty(request("zone")))
 						from.ZoneName = request("zone");
-					sorter.MoveTo(from, to);
+				sorter.MoveTo(from, NodePosition.Before, before);
+			}
+			else
+			{
+				var to = engine.Resolve<Navigator>().Navigate(request("to"));
+
+				PerformMoveChecks(context, from, to);
+
+					if (!string.IsNullOrEmpty(request("zone")))
+						from.ZoneName = request("zone");
+				sorter.MoveTo(from, to);
 					engine.Resolve<ITrashHandler>().HandleMoved(from);
-				}
+			}
 				engine.Persister.Save(from);
 				tx.Commit();
 			}

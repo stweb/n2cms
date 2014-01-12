@@ -1,8 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using N2.Persistence;
 using System.Diagnostics;
 using N2.Collections;
 
@@ -11,132 +10,127 @@ namespace N2.Persistence
 	[DebuggerDisplay("ParameterCollection: Count = {parameters.Count}")]
 	[DebuggerTypeProxy(typeof(CollectionDebugView<>))]
 	public class ParameterCollection : ICollection<IParameter>, IParameter
-    {
-        public ParameterCollection()
+	{
+		public ParameterCollection()
 			: this(Operator.And)
-		{
-        }
-
-        public ParameterCollection(Operator op)
-        {
-            Operator = op;
-        }
-
-        public ParameterCollection(params IParameter[] parameters)
-            : this(Operator.And, parameters)
-        {
-        }
-
-		public ParameterCollection(IEnumerable<IParameter> parameters)
-			: this(Operator.And, parameters)
 		{
 		}
 
-		public ParameterCollection(Operator op, IEnumerable<IParameter> parameters)
-			: this(op)
+		public ParameterCollection(Operator op)
+		{
+			Operator = op;
+		}
+
+		public ParameterCollection(params IParameter[] parameters)
+			: this(Operator.And)
 		{
 			this.parameters.AddRange(parameters);
 		}
 
-        List<IParameter> parameters = new List<IParameter>();
-
-        public Operator Operator { get; set; }
-
-        #region ICollection<IParameter>
-        public void Add(IParameter item)
+        public ParameterCollection(Operator op, IEnumerable<IParameter> parameters)
+            : this(op)
         {
-            parameters.Add(item);
-        }
+			this.parameters.AddRange(parameters);
+		}
 
-        public void Clear()
-        {
-            parameters.Clear();
-        }
+	    readonly List<IParameter> parameters = new List<IParameter>();
 
-        public bool Contains(IParameter item)
-        {
-            return parameters.Contains(item);
-        }
+		public Operator Operator { get; set; }
 
-        public void CopyTo(IParameter[] array, int arrayIndex)
-        {
-            parameters.CopyTo(array, arrayIndex);
-        }
+		#region ICollection<IParameter>
+		public void Add(IParameter item)
+		{
+			parameters.Add(item);
+		}
 
-        public int Count
-        {
-            get { return parameters.Count; }
-        }
+		public void Clear()
+		{
+			parameters.Clear();
+		}
 
-        bool ICollection<IParameter>.IsReadOnly
-        {
-            get { return ((ICollection<IParameter>)parameters).IsReadOnly; }
-        }
+		public bool Contains(IParameter item)
+		{
+			return parameters.Contains(item);
+		}
 
-        public bool Remove(IParameter item)
-        {
-            return parameters.Remove(item);
-        }
-        #endregion
+		public void CopyTo(IParameter[] array, int arrayIndex)
+		{
+			parameters.CopyTo(array, arrayIndex);
+		}
 
-        #region IEnumerable<IParameter>
-        public IEnumerator<IParameter> GetEnumerator()
-        {
-            return parameters.GetEnumerator();
-        }
+		public int Count
+		{
+			get { return parameters.Count; }
+		}
 
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-        #endregion
+		bool ICollection<IParameter>.IsReadOnly
+		{
+			get { return ((ICollection<IParameter>)parameters).IsReadOnly; }
+		}
 
-        public static ParameterCollection operator &(ParameterCollection q1, IParameter q2)
-        {
-            return new ParameterCollection(Persistence.Operator.And) { { q1 }, { q2 } };
-        }
-        public static ParameterCollection operator |(ParameterCollection q1, IParameter q2)
-        {
-            return new ParameterCollection(Persistence.Operator.Or) { { q1 }, { q2 } };
-        }
+		public bool Remove(IParameter item)
+		{
+			return parameters.Remove(item);
+		}
+		#endregion
 
+		#region IEnumerable<IParameter>
+		public IEnumerator<IParameter> GetEnumerator()
+		{
+			return parameters.GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
+		#endregion
+
+		public static ParameterCollection operator &(ParameterCollection q1, IParameter q2)
+		{
+			return new ParameterCollection(Operator.And) { q1, q2};
+		}
+		public static ParameterCollection operator |(ParameterCollection q1, IParameter q2)
+		{
+			return new ParameterCollection(Operator.Or) { q1, q2};
+		}
 		public static ParameterCollection Empty
 		{
 			get { return new ParameterCollection(); }
 		}
 
-        public bool IsMatch(object item)
-        {
+
+		public bool IsMatch(object item)
+		{
 			if (Count == 0)
 				return true;
 
-            if (Operator == Persistence.Operator.And)
-                return this.All(p => p.IsMatch(item));
+			if (Operator == Operator.And)
+				return this.All(p => p.IsMatch(item));
 
-            return this.Any(p => p.IsMatch(item));
-        }
+			return this.Any(p => p.IsMatch(item));
+		}
 
-        public ParameterCollection OrderBy(string expression)
-        {
-            this.Order = new Order(expression);
-            return this;
-        }
+		public ParameterCollection OrderBy(string expression)
+		{
+			Order = new Order(expression);
+			return this;
+		}
 
-        public ParameterCollection Skip(int skip)
-        {
-            this.Range = new Range(skip, Range != null ? Range.Take : 0);
-            return this;
-        }
+		public ParameterCollection Skip(int skip)
+		{
+			Range = new Range(skip, Range != null ? Range.Take : 0);
+			return this;
+		}
 
-        public ParameterCollection Take(int take)
-        {
-            this.Range = new Range(Range != null ? Range.Skip : 0, take);
-            return this;
-        }
+		public ParameterCollection Take(int take)
+		{
+			Range = new Range(Range != null ? Range.Skip : 0, take);
+			return this;
+		}
 
-        public Order Order { get; set; }
-        public Range Range { get; set; }
-
+		public Order Order { get; set; }
+		public Range Range { get; set; }
 		#region Equals & GetHashCode
 		public override bool Equals(object obj)
 		{
@@ -172,12 +166,13 @@ namespace N2.Persistence
 			return hash;
 		}
 
-        public override string ToString()
-        {
-            return string.Join((Operator == Persistence.Operator.And ? " & " : " | "), parameters.Select(p => p.ToString()))
-                + (Range == null ? "" : (" (" + Range.Skip + " - " + (Range.Skip + Range.Take)) + ")")
-                + (Order == null ? "" : (" (by " + Order.Property + (Order.Descending ? " DESC" : "")) + ")");
-        }
+
+		public override string ToString()
+		{
+			return string.Join((Operator == Operator.And ? " & " : " | "), parameters.Select(p => p.ToString()))
+				+ (Range == null ? "" : (" (" + Range.Skip + " - " + (Range.Skip + Range.Take)) + ")")
+				+ (Order == null ? "" : (" (by " + Order.Property + (Order.Descending ? " DESC" : "")) + ")");
 		#endregion
+		}
 	}
 }
