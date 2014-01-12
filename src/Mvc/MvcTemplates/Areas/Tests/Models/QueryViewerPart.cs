@@ -1,4 +1,4 @@
-﻿#if DEBUG
+﻿#if LOG4NET
 using System;
 using System.Collections.Generic;
 using System.Linq;
