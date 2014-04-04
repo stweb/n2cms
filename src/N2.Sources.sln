@@ -626,7 +626,7 @@ Global
 		{E09BC247-32BA-4240-B9C8-5CDDF4BAB2A9} = {C69DDE3C-8B79-4DDC-867B-C461F605AAA7}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Framework\N2\N2.csproj
+		StartupItem = Mvc\Dinamico\Dinamico.csproj
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

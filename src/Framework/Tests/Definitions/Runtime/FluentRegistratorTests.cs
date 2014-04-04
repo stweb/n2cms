@@ -23,7 +23,7 @@ namespace N2.Tests.Definitions.Runtime
 		{
 			public virtual string Text { get; set; }
 			public virtual int Number { get; set; }
-			public virtual TestStatus Enum { get; set; }
+            public virtual TestStatus Enum { get; set; }
 			public virtual IEnumerable<string> Strings { get; set; }
 			public virtual IEnumerable<FluentItem> Items { get; set; }
 			public virtual FluentItem Item { get; set; }

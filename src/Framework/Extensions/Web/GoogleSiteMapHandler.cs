@@ -56,7 +56,7 @@ namespace N2.Web
 		{
 			context.TrySetCompressionFilter();
 			context.Response.SetOutputCache(N2.Utility.CurrentTime().AddDays(1));
-			context.Response.AddCacheDependency(new ContentCacheDependency(Engine.Persister));
+			// TODO context.Response.AddCacheDependency(new ContentCacheDependency(Engine.Persister));
 		}
 
 		public IEngine Engine { get { return Context.Current; } }

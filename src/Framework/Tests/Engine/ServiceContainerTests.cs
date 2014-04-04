@@ -2,6 +2,12 @@
 using N2.Engine;
 using N2.Engine.Castle;
 using N2.Engine.MediumTrust;
+#if NINJECT
+using N2.IoC.Ninject;
+#endif
+#if SIMPLE_INJECTOR
+using N2.IoC.SimpleInjector;
+#endif
 using N2.Plugin;
 using N2.Tests.Engine.Services;
 using NUnit.Framework;
@@ -39,9 +45,40 @@ namespace N2.Tests.Engine
 		}
 	}
 
+#if SIMPLE_INJECTOR
+    [TestFixture, Ignore("incomplete")]
+    public class SimpleIoCServiceContainerTests : ServiceContainerTests
+    {
+        [SetUp]
+        public void SetUp()
+        {
+            container = new SimpleServiceContainer();
+        }
+    }
+#endif
+
+#if NINJECT
+    [TestFixture]
+    public class NinjectServiceContainerTests : ServiceContainerTests
+    {
+        [SetUp]
+        public void SetUp()
+        {
+            NinjectServiceContainer.SetKernel(null); // force new kernel
+            container = new NinjectServiceContainer();
+        }
+    }
+#endif
+
 	public abstract class ServiceContainerTests
 	{
 		protected IServiceContainer container;
+
+        [Test, ExpectedException]
+        public void Resolve_Service_Unknown()
+        {
+            var service = container.Resolve<IService>();
+        }
 
 		[Test]
 		public void Resolve_Service_Generic()
@@ -78,11 +115,22 @@ namespace N2.Tests.Engine
 		{
 			container.AddComponent("key", typeof(IService), typeof(InterfacedService));
 
-			var services = container.ResolveAll<IService>();
+			var services = container.ResolveAll(typeof(IService));
 
 			Assert.That(services.Count(), Is.EqualTo(1));
 			Assert.That(services.First(), Is.InstanceOf<InterfacedService>());
 		}
+
+        [Test]
+        public void ResolveAll_SingleServices_Generic()
+        {
+            container.AddComponent("key", typeof(IService), typeof(InterfacedService));
+
+            var services = container.ResolveAll<IService>();
+
+            Assert.That(services.Count(), Is.EqualTo(1));
+            Assert.That(services.First(), Is.InstanceOf<InterfacedService>());
+        }
 
 		[Test]
 		public void ResolveAll_MultipleServices_Generic()

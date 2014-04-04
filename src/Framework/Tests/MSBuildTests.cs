@@ -151,8 +151,11 @@ namespace N2.Tests
 		[Test]
 		public void CanOperate_OnProject()
 		{
+#if MONO
+			string input = File.ReadAllText(@"../../N2.Tests.csproj");
+#else
 			string input = File.ReadAllText(@"..\..\N2.Tests.csproj");
-
+#endif
 			string result = Regex.Replace(input, pattern, replacement, RegexOptions.Singleline);
 
 			Assert.That(input.Contains("ProjectReference"), Is.True);

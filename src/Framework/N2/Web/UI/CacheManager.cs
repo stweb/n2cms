@@ -46,8 +46,8 @@ namespace N2.Web.UI
 
         public virtual void AddCacheInvalidation(HttpResponse response)
         {
-			response.AddCacheDependency(new ContentCacheDependency(persister));
-			response.Cache.AddValidationCallback(ValidateCacheRequest, null);
+			// TODO response.AddCacheDependency(new ContentCacheDependency(persister));
+			// TODO response.Cache.AddValidationCallback(ValidateCacheRequest, null);
         }
 
         public virtual OutputCacheParameters GetOutputCacheParameters()
@@ -58,9 +58,9 @@ namespace N2.Web.UI
             if (context.CurrentPage != null && context.CurrentPage.Expires.HasValue)
             {
                 DateTime expires = context.CurrentPage.Expires.Value;
-                if (expires > N2.Utility.CurrentTime() && expires < N2.Utility.CurrentTime().AddSeconds(parameters.Duration))
+                if (expires > DateTime.Now && expires < DateTime.Now.AddSeconds(parameters.Duration))
                 {
-                    parameters.Duration = (int)expires.Subtract(N2.Utility.CurrentTime()).TotalSeconds;
+                    parameters.Duration = (int)expires.Subtract(DateTime.Now).TotalSeconds;
                 }
             }
             parameters.Enabled = enabled;

@@ -17,16 +17,19 @@ namespace N2.Tests.Definitions
 		
 		class EmptyItem : ContentItem
 		{
+
 		}
 
 		[SetUp]
 		public void SetUp()
 		{
-			registration = new ContentRegistration(new DefinitionMap().GetOrCreateDefinition(typeof(EmptyItem)));
+			var n = new DefinitionMap ();
+			var i = n.GetOrCreateDefinition (typeof(EmptyItem));
+			registration = new ContentRegistration(i);
 		}
 
 		[Test]
-		public void RegisteringCheckBox_AddsEditableCheckBox_ToDefinition()
+		public void RegisteringCheckBoxAddsEditableCheckBoxToDefinition()
 		{
 			registration.CheckBox("Visible", "Show the page in navigation");
 
