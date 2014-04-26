@@ -106,10 +106,9 @@ namespace N2.Persistence.NH
 			if (config.Isolation.HasValue)
 				Properties[NHibernate.Cfg.Environment.Isolation] = config.Isolation.ToString();
 
-			foreach (string key in config.HibernateProperties.AllKeys)
-			{
-				Properties[key] = config.HibernateProperties[key].Value;
-			}
+            if (config.HibernateProperties.Count > 0) // this line added to avoid error on MONO
+			    foreach (string key in config.HibernateProperties.AllKeys)
+    				Properties[key] = config.HibernateProperties[key].Value;
 		}
 
 		/// <summary>

@@ -77,17 +77,24 @@ namespace N2.Definitions
 			var definitionTemplatePair = discriminator.Split('/');
 
 			var e = new DefinitionEventArgs();
+            var allDefs = GetDefinitions().ToList();
 			if (definitionTemplatePair.Length > 1)
 			{
-				foreach (ItemDefinition definition in GetDefinitions())
-					if (definition.Discriminator == definitionTemplatePair[0] && definition.TemplateKey == definitionTemplatePair[1])
-						e.Definition = definition;
+                foreach (ItemDefinition definition in allDefs)
+                    if (definition.Discriminator == definitionTemplatePair[0] && definition.TemplateKey == definitionTemplatePair[1])
+                    {
+                        e.Definition = definition;
+                        break;
+                    }
 			}
 			else
 			{
-				foreach (ItemDefinition definition in GetDefinitions())
-					if (definition.Discriminator == discriminator)
-						e.Definition = definition;
+                foreach (ItemDefinition definition in allDefs)
+                    if (definition.Discriminator == discriminator)
+                    {
+                        e.Definition = definition;
+                        break;
+                    }
 			}
 
 			if (DefinitionResolving != null)
