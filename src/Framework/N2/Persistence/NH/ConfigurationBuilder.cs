@@ -163,12 +163,16 @@ namespace N2.Persistence.NH
 					Properties[NHibernate.Cfg.Environment.Dialect] = typeof(NHibernate.Dialect.MySQL5Dialect).AssemblyQualifiedName;
 					break;
 				case DatabaseFlavour.SqLite:
-					Properties[NHibernate.Cfg.Environment.ConnectionDriver] = typeof(NHibernate.Driver.SQLite20Driver).AssemblyQualifiedName;
-					Properties[NHibernate.Cfg.Environment.Dialect] = typeof(NHibernate.Dialect.SQLiteDialect).AssemblyQualifiedName;
-					break;
+                  #if __MonoCS__                  
+                    Properties[NHibernate.Cfg.Environment.ConnectionDriver] = typeof(NHibernate.Driver.MonoSqliteDriver).AssemblyQualifiedName;
+                  #else
+                    Properties[NHibernate.Cfg.Environment.ConnectionDriver] = typeof(NHibernate.Driver.SQLite20Driver).AssemblyQualifiedName;
+                  #endif
+                    Properties[NHibernate.Cfg.Environment.Dialect] = typeof(NHibernate.Dialect.SQLiteDialect).AssemblyQualifiedName;
+                    break;
 				case DatabaseFlavour.Firebird:
 					Properties[NHibernate.Cfg.Environment.ConnectionDriver] = typeof(NHibernate.Driver.FirebirdDriver).AssemblyQualifiedName;
-					Properties[NHibernate.Cfg.Environment.Dialect] = typeof(NHibernate.Dialect.FirebirdDialect).AssemblyQualifiedName;
+                    Properties[NHibernate.Cfg.Environment.Dialect] = typeof(NHibernate.Dialect.FirebirdDialect).AssemblyQualifiedName;
 					break;
 				case DatabaseFlavour.Generic:
 					Properties[NHibernate.Cfg.Environment.ConnectionDriver] = typeof(NHibernate.Driver.OleDbDriver).AssemblyQualifiedName;
