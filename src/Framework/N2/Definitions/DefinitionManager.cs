@@ -17,7 +17,6 @@ namespace N2.Definitions
     public class DefinitionManager : IDefinitionManager, IAutoStart
     {
         private readonly IDefinitionProvider[] definitionProviders;
-        private readonly ITemplateProvider[] providers;
         private readonly ContentActivator activator;
         private readonly StateChanger stateChanger;
         private readonly DefinitionMap map;

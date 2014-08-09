@@ -1,10 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Web;
-using System.Web.Caching;
 using N2.Persistence;
-using N2.Web.UI;
 using N2.Configuration;
 
 namespace N2.Web
@@ -20,7 +16,7 @@ namespace N2.Web
 
         private static readonly object pathLock = new object();
         private static readonly object urlLock = new object();
-        private CacheWrapper cache;
+        private readonly CacheWrapper cache;
 
         public CachingUrlParserDecorator(IUrlParser inner, IPersister persister, IWebContext webContext, CacheWrapper cache, HostSection config)
         {
@@ -75,7 +71,7 @@ namespace N2.Web
             
 
             var cacheKey = "N2.UrlCache" + webContext.Url.Authority.ToLower();
-            Dictionary<int, string> itemToUrlCache = cache.Get<Dictionary<int, string>>(cacheKey);
+            var itemToUrlCache = cache.Get<Dictionary<int, string>>(cacheKey);
             if (itemToUrlCache == null)
             {
                 lock (urlLock)
@@ -156,12 +152,12 @@ namespace N2.Web
             return data;
         }
 
-        [Obsolete("Use FindPath")]
         /// <summary>Finds the path associated with an url.</summary>
         /// <param name="url">The url to the template to locate.</param>
         /// <param name="startNode">The node to start finding path from if none supplied will start from StartNode</param>
         /// <param name="remainingPath">The remaining path to search</param>
         /// <returns>A PathData object. If no template was found the object will have empty properties.</returns>
+        [Obsolete("Use FindPath")]
         public PathData ResolvePath(Url url, ContentItem startNode = null, string remainingPath = null)
         {
             return FindPath(url, startNode, remainingPath);

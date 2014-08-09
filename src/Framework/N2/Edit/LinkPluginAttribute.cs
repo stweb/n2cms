@@ -8,11 +8,7 @@ namespace N2.Edit
     /// </summary>
     public abstract class LinkPluginAttribute : AdministrativePluginAttribute
     {
-        private string globalResourceClassName;
         private string target = Targets.Preview;
-        private string title;
-        private string toolTip;
-        private string urlFormat;
 
         public bool IsDivider { get; set; }
 
@@ -24,40 +20,23 @@ namespace N2.Edit
         }
 
         /// <summary>The plugin's text.</summary>
-        public string Title
-        {
-            get { return title; }
-            set { title = value; }
-        }
+        public string Title { get; set; }
 
         /// <summary>
         /// The plugin's url format. These magic strings are interpreted by the 
         /// client and inserted in the url before the frame is loaded: 
         /// {selected}, {memory}, {action}
         /// </summary>
-        public string UrlFormat
-        {
-            get { return urlFormat; }
-            set { urlFormat = value; }
-        }
+        public string UrlFormat { get; set; }
 
         /// <summary>The plugin's tool tip.</summary>
-        public string ToolTip
-        {
-            get { return toolTip; }
-            set { toolTip = value; }
-        }
+        public string ToolTip { get; set; }
 
         /// <summary>Alternative text for the icon.</summary>
         public string AlternativeText { get; set; }
 
         /// <summary>Used for translating the plugin's texts from a global resource.</summary>
-        public string GlobalResourceClassName
-        {
-            get { return globalResourceClassName; }
-            set { globalResourceClassName = value; }
-        }
-
+        public string GlobalResourceClassName { get; set; }
 
         public override Control AddTo(Control container, PluginContext context)
         {
@@ -69,18 +48,20 @@ namespace N2.Edit
         {
             string tooltip = Utility.GetResourceString(GlobalResourceClassName, Name + ".ToolTip") ?? ToolTip;
             string title = Utility.GetResourceString(GlobalResourceClassName, Name + ".Title") ?? Title;
-            string alternative = Utility.GetResourceString(GlobalResourceClassName, Name + ".AlternativeText") ?? AlternativeText;
+            //not used string alternative = Utility.GetResourceString(GlobalResourceClassName, Name + ".AlternativeText") ?? AlternativeText;
 
-            HyperLink a = new HyperLink();
-            a.ID = "h" + Name;
-            a.NavigateUrl = context.Rebase(context.Format(UrlFormat, true));
-            a.SkinID = "ToolBarLink_" + Name;
+            var a = new HyperLink
+            {
+                ID = "h" + Name,
+                NavigateUrl = context.Rebase(context.Format(UrlFormat, true)),
+                SkinID = "ToolBarLink_" + Name,
+                Target = Target,
+                ToolTip = tooltip,
+                Text = title
+            };
 
-            a.Target = Target;
             a.Attributes["class"] = "templatedurl " + Name + " " + RequiredPermission.ToString() + (string.IsNullOrEmpty(IconUrl) ? "" : " iconed");
             a.Attributes["data-url-template"] = context.Rebase(UrlFormat);
-            a.ToolTip = tooltip;
-            a.Text = title;
             ApplyStyles(context, a);
 
             container.Controls.Add(a);

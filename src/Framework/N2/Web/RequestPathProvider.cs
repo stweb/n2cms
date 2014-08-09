@@ -3,7 +3,6 @@ using System.Collections.Specialized;
 using N2.Configuration;
 using N2.Edit.Versioning;
 using N2.Engine;
-using N2.Web.UI.WebControls;
 
 namespace N2.Web
 {

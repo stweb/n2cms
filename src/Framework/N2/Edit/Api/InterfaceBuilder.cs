@@ -234,7 +234,7 @@ namespace N2.Management.Api
             };
             children.AddRange(engine.EditManager.GetPlugins<NavigationPluginAttribute>(context.User)
                 .Where(np => !np.Legacy)
-                .Select(np => GetNode(np)));
+                .Select(GetNode));
 
             return new Node<InterfaceMenuItem>
             {
@@ -261,7 +261,7 @@ namespace N2.Management.Api
                 if (tp.OptionProvider != null)
                 {
                     var options = (IProvider<ToolbarOption>)engine.Resolve(tp.OptionProvider);
-                    node.Children = options.GetAll().Select(o => GetNode(o)).ToList();
+                    node.Children = options.GetAll().Select(GetNode).ToList();
                 }
             }
             return node;
@@ -357,7 +357,7 @@ namespace N2.Management.Api
                         new Node<InterfaceMenuItem>(new InterfaceMenuItem { Name = "delete", Title = "Delete", IconClass = "fa fa-trash-o", Url = "{{appendSelection('{ManagementUrl}/Content/Delete.aspx')}}".ResolveUrlTokens(), ToolTip = "Move selected item to trash", RequiredPermission = Permission.Publish, HiddenBy = "Deleted" }),
                         new Node<InterfaceMenuItem>(new InterfaceMenuItem { Name = "publish", Title = "Publish", IconClass = "fa fa-play-sign", ClientAction = "publish()", RequiredPermission = Permission.Publish, HiddenBy = "Published" }),
                         new Node<InterfaceMenuItem>(new InterfaceMenuItem { Name = "schedule", TemplateUrl = "App/Partials/ContentPublishSchedule.html", RequiredPermission = Permission.Publish, DisplayedBy = "Draft" }),
-                        new Node<InterfaceMenuItem>(new InterfaceMenuItem { Name = "unpublish", Title = "Unpublish", IconClass = "fa fa-stop", ClientAction = "unpublish()", RequiredPermission = Permission.Publish, DisplayedBy = "Published" }),
+                        new Node<InterfaceMenuItem>(new InterfaceMenuItem { Name = "unpublish", Title = "Unpublish", IconClass = "fa fa-stop", ClientAction = "unpublish()", RequiredPermission = Permission.Publish, DisplayedBy = "Published" })
                     }
                 },
                 new Node<InterfaceMenuItem>(new InterfaceMenuItem { Name = "frameaction", TemplateUrl = "App/Partials/FrameAction.html", RequiredPermission = Permission.Write }),
@@ -368,7 +368,7 @@ namespace N2.Management.Api
                     Children = new[]
                     {
                         new Node<InterfaceMenuItem>(new InterfaceMenuItem { Name = "password", Title = "Change password", IconClass = "fa fa-user", ToolTip = "Manage password", Target = Targets.Preview, Url = "{Account.EditPassword.PageUrl}".ResolveUrlTokens(), SelectedBy = "EditPassword" }),
-  				        new Node<InterfaceMenuItem>(new InterfaceMenuItem { Name = "signout", Title = "Sign out", IconClass = "fa fa-signout", ToolTip = "Sign out {{Context.User.Name}}", Url = "{Account.Logout.PageUrl}".ResolveUrlTokens() }),
+  				        new Node<InterfaceMenuItem>(new InterfaceMenuItem { Name = "signout", Title = "Sign out", IconClass = "fa fa-signout", ToolTip = "Sign out {{Context.User.Name}}", Url = "{Account.Logout.PageUrl}".ResolveUrlTokens() })
                         /*
                         REMOVE: new Node<InterfaceMenuItem>(new InterfaceMenuItem { Name = "password", Title = "Change password", IconClass = "fa fa-user", ToolTip = "Manage password", Target = Targets.Preview, Url = "{ManagementUrl}/Myself/EditPassword.aspx".ResolveUrlTokens(), SelectedBy = "EditPassword" }),
                         REMOVE: new Node<InterfaceMenuItem>(new InterfaceMenuItem { Name = "signout", Title = "Sign out", IconClass = "fa fa-signout", ToolTip = "Sign out {{Context.User.Name}}", Url = "{ManagementUrl}/Login.aspx?logout=true".ResolveUrlTokens() }),
@@ -380,7 +380,7 @@ namespace N2.Management.Api
 
             children.AddRange(engine.EditManager.GetPlugins<ToolbarPluginAttribute>(context.User)
                     .Where(np => !np.Legacy)
-                    .Select(np => GetNode(np)));
+                    .Select(GetNode));
 
             return new Node<InterfaceMenuItem>
             {
