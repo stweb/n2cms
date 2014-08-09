@@ -1,13 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
+using N2.Engine;
 using N2.Persistence.Serialization;
 using System.IO;
 using N2.Xml;
-using N2.Engine;
 using N2.Edit.Web;
 using N2.Edit;
 using System.Text;
@@ -39,13 +35,16 @@ namespace N2.Management.Content.Export
                 }
                 ShowErrors(record);
             }
-            catch (WrongVersionException)
+            catch (WrongVersionException ex)
             {
+                Logger.Error("you're using an obsolete format: ", ex);
+/*
                 using (Stream s = File.OpenRead(UploadedFilePath))
                 {
                     N2XmlReader xr = new N2XmlReader(N2.Context.Current);
                     importedItems.CurrentItem = xr.Read(s);
                 }
+ */ 
             }
 
             DataBind();
@@ -55,17 +54,20 @@ namespace N2.Management.Content.Export
         {
             Importer importer = Engine.Resolve<Importer>();
 
-            IImportRecord record;
+            IImportRecord record = null;
             try
             {
                 record = importer.Read(UploadedFilePath);
                 ShowErrors(record);
             }
-            catch (WrongVersionException)
+            catch (WrongVersionException ex)
             {
+                Logger.Error("you're using an obsolete format: ", ex);
+/*                
                 N2XmlReader xr = new N2XmlReader(N2.Context.Current);
                 ContentItem item = xr.Read(File.OpenRead(UploadedFilePath));
                 record = CreateRecord(item);
+ */ 
             }
 
             Import(importer, record);
@@ -133,17 +135,20 @@ namespace N2.Management.Content.Export
         {
             Importer importer = Engine.Resolve<Importer>();
 
-            IImportRecord record;
+            IImportRecord record = null;
             try
             {
                 record = importer.Read(postedFile.InputStream, postedFile.FileName);
             }
-            catch (WrongVersionException)
+            catch (WrongVersionException ex)
             {
+                Logger.Error("you're using an obsolete format: ", ex);
+/*       
                 N2XmlReader xr = new N2XmlReader(N2.Context.Current);
                 ContentItem item = xr.Read(postedFile.InputStream);
                 record = CreateRecord(item);
                 ShowErrors(record);
+ */
             }
 
             Import(importer, record);

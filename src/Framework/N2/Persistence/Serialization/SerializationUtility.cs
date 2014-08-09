@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
@@ -30,6 +31,19 @@ namespace N2.Persistence.Serialization
             return value.Value.ToUniversalTime().ToString(System.Globalization.CultureInfo.InvariantCulture);
         }
 
+        public static DateTime UniversalStringToDateTime(string value)
+        {
+            DateTime result;
+
+            return DateTime.TryParse(
+                    value,
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    System.Globalization.DateTimeStyles.None,
+                    out result)
+                ? result.ToLocalTime()
+                : Utility.CurrentTime();
+        }
+
         public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> values, TKey key)
         {
             TValue value;
@@ -52,11 +66,20 @@ namespace N2.Persistence.Serialization
             }
             return text.ToString();
         }
+
+        public static string GetLocalhostFqdn()
+        {
+            var ipProperties = IPGlobalProperties.GetIPGlobalProperties();
+            return string.Format("{0}.{1}", ipProperties.HostName, ipProperties.DomainName);
+        }
+
+        // used to guess state if xml reader cannot read state property
+        // TODO - move to content item and check if still needed
         internal static ContentState RecaulculateState(ContentItem item)
         {
             if (!item.Published.HasValue)
                 return ContentState.Draft;
-            if (item.Published.HasValue && Utility.CurrentTime() < item.Published.Value)
+            else if (Utility.CurrentTime() < item.Published.Value)
                 return ContentState.Waiting;
             if (item.Expires.HasValue && item.Expires.Value <= Utility.CurrentTime())
                 return ContentState.Unpublished;

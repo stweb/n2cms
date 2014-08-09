@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Xml.XPath;
 using N2.Definitions;
 using N2.Engine;
-using N2.Edit.FileSystem;
 using N2.Security;
 
 namespace N2.Persistence.Serialization
@@ -12,7 +11,6 @@ namespace N2.Persistence.Serialization
     {
         bool IgnoreMissingTypes { get; set; }
         IImportRecord Read(XPathNavigator navigator);
-        //ContentItem ReadSingleItem(XPathNavigator navigator, ReadingJournal journal);
     }
 
     [Service]
@@ -23,17 +21,17 @@ namespace N2.Persistence.Serialization
         private readonly ContentActivator activator;
         private readonly IDictionary<string, IXmlReader> readers;
 
-		public ItemXmlReader(IDefinitionManager definitions, ContentActivator activator)
-		{
-			if (definitions == null)
-				throw new ArgumentNullException("definitions");
+        public ItemXmlReader(IDefinitionManager definitions, ContentActivator activator)
+        {
+            if (definitions == null)
+                throw new ArgumentNullException("definitions");
 
-			this.definitions = definitions;
-			this.activator = activator;
-			this.readers = DefaultReaders();
-		}
+            this.definitions = definitions;
+            this.activator = activator;
+            this.readers = DefaultReaders();
+        }
 
-		public bool IgnoreMissingTypes { get; set; }
+        public bool IgnoreMissingTypes { get; set; }
 
         private static IDictionary<string, IXmlReader> DefaultReaders()
         {
@@ -77,33 +75,44 @@ namespace N2.Persistence.Serialization
             ContentItem item = CreateInstance(attributes);
             ReadDefaultAttributes(attributes, item, journal);
 
-            foreach(XPathNavigator current in EnumerateChildren(navigator))
+            foreach (XPathNavigator current in EnumerateChildren(navigator))
             {
-                if(readers.ContainsKey(current.LocalName))
+                if (readers.ContainsKey(current.LocalName))
                     readers[current.LocalName].Read(current, item, journal);
             }
 
             return item;
         }
 
+        private string GetStringOrNull(Dictionary<string, string> attributes, string key)
+        {
+            if (attributes.ContainsKey(key))
+            {
+                var value = attributes[key];
+                if (!string.IsNullOrEmpty(value))
+                    return value;
+            }
+            return null;
+        }
+
         protected virtual void ReadDefaultAttributes(Dictionary<string, string> attributes, ContentItem item, ReadingJournal journal)
         {
-            item.Created = ToNullableDateTime(attributes["created"]).Value;
-            item.Expires = ToNullableDateTime(attributes["expires"]);
+            item.Created = ToDateTime(attributes["created"]);
+            item.Expires = attributes.ContainsKey("expires") ? ToNullableDateTime(attributes["expires"]) : null;
             item.ID = Convert.ToInt32(attributes["id"]);
-            item.Name = attributes["name"];
+            item.Name = GetStringOrNull(attributes, "name");
             if (item.ID.ToString() == item.Name)
                 item.Name = null;
-            item.Published = ToNullableDateTime(attributes["published"]);
-            item.SavedBy = attributes["savedBy"];
+
+            item.Published = attributes.ContainsKey("published") ? ToNullableDateTime(attributes["published"]) : null;
+            item.SavedBy = attributes.ContainsKey("savedBy") ? attributes["savedBy"] : null;
             item.SortOrder = Convert.ToInt32(attributes["sortOrder"]);
-            item.Title = attributes["title"];
-            item.Updated = ToNullableDateTime(attributes["updated"]).Value;
+            item.Title = attributes.ContainsKey("title") ? attributes["title"] : "";
+            item.Updated = ToDateTime(attributes["updated"]);
             item.Visible = Convert.ToBoolean(attributes["visible"]);
-            if (!string.IsNullOrEmpty(attributes["zoneName"]))
-                item.ZoneName = attributes["zoneName"];
-            if (attributes.ContainsKey("templateKey") && !string.IsNullOrEmpty(attributes["templateKey"]))
-                item.TemplateKey = attributes["templateKey"];
+
+            item.ZoneName = GetStringOrNull(attributes, "zoneName"); // empty string must get converted to null for code to work, see  PersistentContentItemList<T>.FindPages()
+            item.TemplateKey = GetStringOrNull(attributes, "templateKey");
             if (attributes.ContainsKey("translationKey") && !string.IsNullOrEmpty(attributes["translationKey"]))
                 item.TranslationKey = Convert.ToInt32(attributes["translationKey"]);
             if (attributes.ContainsKey("ancestralTrail"))
@@ -126,8 +135,19 @@ namespace N2.Persistence.Serialization
             }
 
             if (attributes.ContainsKey("state") && !string.IsNullOrEmpty(attributes["state"]))
-                item.State = (ContentState)Convert.ToInt32(attributes["state"]);
-            else
+            {
+                // be tolerant to read both old numeric and new textual state
+                var val = attributes["state"];
+                int intval;
+                ContentState newstate;
+                if (int.TryParse(val, out intval))
+                    newstate = (ContentState)intval;
+                else if (!Enum.TryParse(val, true, out newstate))
+                    newstate = SerializationUtility.RecaulculateState(item);
+
+                item.State = newstate;
+            }
+            else // TODO: dangerous migration code
                 item.State = SerializationUtility.RecaulculateState(item);
         }
 
@@ -148,7 +168,7 @@ namespace N2.Persistence.Serialization
                 if (parentItem != null)
                     item.AddTo(parentItem);
                 else
-                    journal.Register(parentVersionKey, (laterParent) => item.AddTo(laterParent), isChild: true);
+                    journal.Register(parentVersionKey, item.AddTo, isChild: true);
             }
         }
 

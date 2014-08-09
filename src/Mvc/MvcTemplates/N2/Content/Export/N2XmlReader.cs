@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml.XPath;
@@ -12,6 +11,7 @@ using N2.Security;
 
 namespace N2.Xml
 {
+    [Obsolete]
     public class N2XmlReader
     {
         #region Constructor

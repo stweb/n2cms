@@ -756,8 +756,6 @@
     <Compile Include="N2\Content\Export\ItemXmlImport.ascx.designer.cs">
       <DependentUpon>ItemXmlImport.ascx</DependentUpon>
     </Compile>
-    <Compile Include="N2\Content\Export\N2XmlReader.cs" />
-    <Compile Include="N2\Content\Export\N2XmlWriter.cs" />
     <Compile Include="N2\Content\LinkTracker\PermanentRedirect.cs" />
     <Compile Include="N2\Content\LinkTracker\UpdateLinksMigration.cs" />
     <Compile Include="N2\Content\LinkTracker\UpdateReferences.aspx.cs">

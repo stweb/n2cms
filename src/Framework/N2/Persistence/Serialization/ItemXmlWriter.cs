@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
 using System.Xml;
 using N2.Definitions;
 using N2.Engine;
@@ -26,16 +24,14 @@ namespace N2.Persistence.Serialization
     public class ItemXmlWriter : IItemXmlWriter
     {
         private readonly IDefinitionManager definitions;
-        //private readonly IUrlParser parser;
         private readonly IFileSystem fs;
 
-		public ItemXmlWriter(IDefinitionManager definitions, /*IUrlParser parser, */IFileSystem fs)
+        public ItemXmlWriter(IDefinitionManager definitions, IFileSystem fs)
         {
             if (definitions == null)
                 throw new ArgumentNullException("definitions");
 
             this.definitions = definitions;
-            //this.parser = parser;
             this.fs = fs;
         }
 
@@ -53,9 +49,9 @@ namespace N2.Persistence.Serialization
         {
             if (!options.IsFlagSet(ExportOptions.ExcludePages) && !options.IsFlagSet(ExportOptions.ExcludeParts))
                 return item.Children;
-            else if (options.IsFlagSet(ExportOptions.ExcludePages))
+            if (options.IsFlagSet(ExportOptions.ExcludePages))
                 return item.Children.Where(c => !c.IsPage);
-            else if (options.IsFlagSet(ExportOptions.ExcludeParts))
+            if (options.IsFlagSet(ExportOptions.ExcludeParts))
                 return item.Children.Where(c => c.IsPage);
             return Enumerable.Empty<ContentItem>();
         }
@@ -66,7 +62,7 @@ namespace N2.Persistence.Serialization
             {
                 WriteDefaultAttributes(itemElement, item);
 
-                foreach(IXmlWriter xmlWriter in GetWriters(options))
+                foreach (IXmlWriter xmlWriter in GetWriters(options))
                 {
                     xmlWriter.Write(item, writer);
                 }
@@ -75,7 +71,7 @@ namespace N2.Persistence.Serialization
 
         private IEnumerable<IXmlWriter> GetWriters(ExportOptions options)
         {
-            if((options & ExportOptions.OnlyDefinedDetails) == ExportOptions.OnlyDefinedDetails)
+            if ((options & ExportOptions.OnlyDefinedDetails) == ExportOptions.OnlyDefinedDetails)
                 yield return new DefinedDetailXmlWriter(definitions);
             else
                 yield return new DetailXmlWriter();
@@ -112,7 +108,9 @@ namespace N2.Persistence.Serialization
             itemElement.WriteAttribute("templateKey", item.TemplateKey);
             if (item.TranslationKey.HasValue)
                 itemElement.WriteAttribute("translationKey", item.TranslationKey.Value);
-            itemElement.WriteAttribute("state", (int)item.State);
+            // use textual state to avoid future import trouble and make XML more readable
+            // TODO OLD might require migration, reader handles both - itemElement.WriteAttribute("state", (int)item.State);
+            itemElement.WriteAttribute("state", Enum.GetName(typeof(ContentState), item.State)); 
             itemElement.WriteAttribute("created", item.Created);
             itemElement.WriteAttribute("updated", item.Updated);
             itemElement.WriteAttribute("published", item.Published);
@@ -123,13 +121,12 @@ namespace N2.Persistence.Serialization
             itemElement.WriteAttribute("savedBy", item.SavedBy);
             itemElement.WriteAttribute("typeName", SerializationUtility.GetTypeAndAssemblyName(item.GetContentType()));
             itemElement.WriteAttribute("discriminator", definitions.GetDefinition(item).Discriminator);
-            itemElement.WriteAttribute("versionIndex", item.VersionIndex);
-            itemElement.WriteAttribute("ancestralTrail", item.AncestralTrail);
-            itemElement.WriteAttribute("alteredPermissions", (int)item.AlteredPermissions);
+            if (item.AlteredPermissions != 0) itemElement.WriteAttribute("alteredPermissions", (int)item.AlteredPermissions);
             itemElement.WriteAttribute("childState", (int)item.ChildState);
-            if(item.VersionOf.HasValue)
+            
+            if (item.VersionOf.HasValue && item.VersionOf.ID != null)
             {
-                Debug.Assert(item.VersionOf.ID != null, "item.VersionOf.ID != null");
+                itemElement.WriteAttribute("versionIndex", item.VersionIndex); // write only if versioned
                 itemElement.WriteAttribute("versionOf", item.VersionOf.ID.Value);
             }
         }

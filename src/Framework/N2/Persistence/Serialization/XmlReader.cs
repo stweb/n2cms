@@ -12,11 +12,13 @@ namespace N2.Persistence.Serialization
         {
             if (!navigator.MoveToFirstAttribute())
                 throw new DeserializationException("Node has no attributes: " + navigator.Name);
-            Dictionary<string, string> attributes = new Dictionary<string, string>();
+            
+            var attributes = new Dictionary<string, string>();
             do
             {
                 attributes.Add(navigator.Name, navigator.Value);
             } while (navigator.MoveToNextAttribute());
+            
             navigator.MoveToParent();
             return attributes;
         }
@@ -25,16 +27,19 @@ namespace N2.Persistence.Serialization
         {
             if (type == typeof(object))
             {
-                byte[] buffer = Convert.FromBase64String(value);
-                BinaryFormatter formatter = new BinaryFormatter();
-                return formatter.Deserialize(new MemoryStream(buffer));
+                try
+                {
+                    byte[] buffer = Convert.FromBase64String(value);
+                    var formatter = new BinaryFormatter();
+                    return formatter.Deserialize(new MemoryStream(buffer));
+                }
+                catch (Exception)
+                {
+                    // TODO log warning
+                    return null;
+                }
             }
-            else if (type == typeof(DateTime))
-            {
-                return ToNullableDateTime(value);
-            }
-            else
-                return Utility.Convert(value, type);
+            return type == typeof(DateTime) ? ToNullableDateTime(value) : Utility.Convert(value, type);
         }
 
         public static IEnumerable<XPathNavigator> EnumerateChildren(XPathNavigator navigator)
@@ -63,6 +68,19 @@ namespace N2.Persistence.Serialization
                 : default(DateTime?);
         }
 
+        public static DateTime ToDateTime(string value)
+        {
+            DateTime _result;
+
+            return DateTime.TryParse(
+                    value,
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    System.Globalization.DateTimeStyles.None,
+                    out _result)
+                ? _result.ToLocalTime()
+                : Utility.CurrentTime();
+        }
+
         protected static void SetLinkedItem(string value, ReadingJournal journal, Action<ContentItem> setter, string versionKey = null)
         {
             int referencedItemID = int.Parse(value);
@@ -76,7 +94,7 @@ namespace N2.Persistence.Serialization
                 }
                 else
                 {
-					journal.Register(referencedItemID, setter, relationType: "link");
+                    journal.Register(referencedItemID, setter, relationType: "link");
                 }
             }
             else if (!string.IsNullOrEmpty(versionKey))

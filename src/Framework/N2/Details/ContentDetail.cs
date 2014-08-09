@@ -135,7 +135,7 @@ namespace N2.Details
                     case TypeKeys.StringType:
                         return stringValue;
                     case TypeKeys.EnumType:
-                        return Enum.Parse(Type.GetType(meta, true, true), stringValue, true);
+                        return GetEnumValue();
                     case TypeKeys.MultiType:
                         return new MultipleValueHolder { BoolValue = BoolValue, DateTimeValue = DateTimeValue, DoubleValue = DoubleValue, IntValue = IntValue, LinkedItem = LinkedItem, ObjectValue = ObjectValue, StringValue = StringValue };
                     default:
@@ -145,6 +145,26 @@ namespace N2.Details
             set
             {
                 valueTypeKey = SetValue(value);
+            }
+        }
+
+        private object GetEnumValue()
+        {
+            if (string.IsNullOrEmpty(meta))
+                return stringValue;
+
+            try
+            {
+                // meta may point to obsolete name, check if it can be resolved
+                Type mt = Type.GetType(meta, true, true);
+                return Enum.Parse(mt, stringValue, true);
+            }
+            catch (Exception)
+            {
+                // degrade to string
+                meta = null;
+                // won't work valueTypeKey = TypeKeys.StringType;
+                return stringValue;
             }
         }
 
