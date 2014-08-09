@@ -9,11 +9,11 @@ namespace N2.Edit
     [Service]
     public class Navigator
     {
-        private IPersister persister;
-        private IHost host;
-        private VirtualNodeFactory virtualNodes;
-        private ContentSource sources;
-        
+        private readonly IPersister persister;
+        private readonly IHost host;
+        private readonly VirtualNodeFactory virtualNodes;
+        private readonly ContentSource sources;
+
         public Navigator(IPersister persister, IHost host, VirtualNodeFactory nodes, ContentSource sources)
         {
             this.persister = persister;
@@ -32,21 +32,23 @@ namespace N2.Edit
 
         public virtual ContentItem Navigate(string path)
         {
-            if (path == null) 
+            if (string.IsNullOrEmpty(path))
                 return null;
 
-            if (!path.StartsWith("/"))
+            if (path.StartsWith("/")) 
+                return Navigate(persister.Get(host.CurrentSite.RootItemID), path);
+            
+            if (path.StartsWith("~"))
             {
-                if (path.StartsWith("~"))
-                {
-                    return Navigate(persister.Get(host.CurrentSite.StartPageID), path.Substring(1))
-                        ?? sources.ResolvePath(path).CurrentItem
-                        ?? virtualNodes.Get(path);
-                }
-                throw new ArgumentException("The path must start with a slash '/', was '" + path + "'", "path");
+                return Navigate(persister.Get(host.CurrentSite.StartPageID), path.Substring(1))
+                       ?? sources.ResolvePath(path).CurrentItem
+                       ?? virtualNodes.Get(path);
             }
 
-            return Navigate(persister.Get(host.CurrentSite.RootItemID), path);
+            if (path.Equals("undefined")) // typical for bad JavaScript URL rendering 
+                return null;
+
+            throw new ArgumentException("The path must start with a slash '/', was '" + path + "'", "path");
         }
     }
 }

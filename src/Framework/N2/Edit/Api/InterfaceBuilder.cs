@@ -294,7 +294,8 @@ namespace N2.Management.Api
 
             foreach (var kvp in replacements)
                 urlFormat = urlFormat.Replace(kvp.Key, kvp.Value);
-            return urlFormat;
+
+            return urlFormat.StartsWith("~") ? Url.ToAbsolute(urlFormat) : urlFormat;
         }
 
         protected virtual InterfacePaths GetUrls(HttpContextBase context, ContentItem selectedItem)

@@ -1,17 +1,14 @@
-using N2.Details;
+using System.Linq;
 using N2.Management.Api;
 using N2.Engine;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace N2.Security
 {
     [Service(typeof(IProfileRepository), Replaces = typeof(InMemoryProfileRepository))]
     public class ContentProfileRepository : IProfileRepository
     {
-        private ItemBridge bridge;
+        private readonly ItemBridge bridge;
 
         public ContentProfileRepository(ItemBridge bridge)
         {
@@ -27,9 +24,10 @@ namespace N2.Security
             var profile = new ProfileUser { Name = username, Email = user.Email };
 
             var clientSettings = user.DetailCollections["Settings"];
-            foreach (var setting in clientSettings.Details)
-                if (!string.IsNullOrEmpty(setting.Meta))
-                    profile.Settings[setting.Meta] = setting.Value;
+            foreach (var setting in clientSettings.Details.Where(setting => setting.Meta != null))
+            {
+                profile.Settings[setting.Meta] = setting.Value;
+            }
             return profile;
         }
 

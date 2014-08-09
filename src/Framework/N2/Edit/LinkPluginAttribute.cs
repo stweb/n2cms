@@ -58,7 +58,6 @@ namespace N2.Edit
             set { globalResourceClassName = value; }
         }
 
-        public string IconClass { get; set; }
 
         public override Control AddTo(Control container, PluginContext context)
         {
@@ -80,7 +79,6 @@ namespace N2.Edit
             a.Target = Target;
             a.Attributes["class"] = "templatedurl " + Name + " " + RequiredPermission.ToString() + (string.IsNullOrEmpty(IconUrl) ? "" : " iconed");
             a.Attributes["data-url-template"] = context.Rebase(UrlFormat);
-            a.Text = tooltip;
             a.ToolTip = tooltip;
             a.Text = title;
             ApplyStyles(context, a);

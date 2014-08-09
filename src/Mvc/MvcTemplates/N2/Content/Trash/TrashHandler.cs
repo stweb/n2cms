@@ -8,7 +8,6 @@ using N2.Engine;
 using N2.Persistence;
 using N2.Security;
 using N2.Web;
-using N2.Collections;
 
 namespace N2.Edit.Trash
 {
@@ -28,7 +27,6 @@ namespace N2.Edit.Trash
         private readonly ISecurityManager security;
         private readonly ContainerRepository<TrashContainerItem> container;
         private readonly StateChanger stateChanger;
-        private readonly IWebContext webContext;
         Logger<TrashHandler> logger;
 
         /// <summary>Instructs this class to navigate rather than query for items.</summary>
@@ -44,13 +42,12 @@ namespace N2.Edit.Trash
             this.security = security;
             this.container = container;
             this.stateChanger = stateChanger;
-            this.webContext = webContext;
         }
 
         /// <summary>The container of thrown items.</summary>
         ITrashCan ITrashHandler.TrashContainer
         {
-            get { return GetTrashContainer(false) as ITrashCan; }
+            get { return GetTrashContainer(false); }
         }
 
         public TrashContainerItem GetTrashContainer(bool create)
@@ -130,7 +127,9 @@ namespace N2.Edit.Trash
         /// <param name="item">The item to restore.</param>
         public virtual void Restore(ContentItem item)
         {
-            ContentItem parent = (ContentItem)item["FormerParent"];
+            var parent = (ContentItem)item["FormerParent"];
+            if (parent == null) return;
+
             RestoreValues(item);
             persister.Save(item);
             persister.Move(item, parent);
@@ -166,7 +165,7 @@ namespace N2.Edit.Trash
         public bool IsInTrash(ContentItem item)
         {
             TrashContainerItem trash = GetTrashContainer(false);
-            return trash != null && Find.IsDescendantOrSelf(item, trash);
+            return trash != null && item != null && Find.IsDescendantOrSelf(item, trash);
         }
 
         protected virtual T Invoke<T>(EventHandler<T> handler, T args)
@@ -194,7 +193,7 @@ namespace N2.Edit.Trash
                     .ToList();
             else
                 expiredItems = persister.Repository.Find(Parameter.Equal("Parent", trash) 
-                    & Parameter.LessOrEqual(TrashHandler.DeletedDate, tresholdDate).Detail()).ToList();
+                    & Parameter.LessOrEqual(DeletedDate, tresholdDate).Detail()).ToList();
             
             try
             {
