@@ -25,10 +25,11 @@ namespace N2.Web
         static ThreadContext()
 		{
 			baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-			int binIndex = baseDirectory.IndexOf("\\bin\\");
+
+            int binIndex = baseDirectory.IndexOf(Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar);
 			if (binIndex >= 0)
 				baseDirectory = baseDirectory.Substring(0, binIndex);
-			else if (baseDirectory.EndsWith("\\bin"))
+            else if (baseDirectory.EndsWith(Path.DirectorySeparatorChar + "bin"))
 				baseDirectory = baseDirectory.Substring(0, baseDirectory.Length - 4);
         }
 

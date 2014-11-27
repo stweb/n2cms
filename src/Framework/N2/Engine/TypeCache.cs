@@ -201,8 +201,10 @@ namespace N2.Engine
 
 		public virtual IEnumerable<string> GetProbingPaths()
 		{
-			if (Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "bin\\"))
-				return new[] { AppDomain.CurrentDomain.BaseDirectory + "bin\\" };
+            var binDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin");
+
+			if (Directory.Exists(binDir))
+				return new[] { binDir };
 			else
 				return new[] { AppDomain.CurrentDomain.BaseDirectory };
 		}
