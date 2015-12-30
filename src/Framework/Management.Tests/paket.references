@@ -1,0 +1,5 @@
+Microsoft.AspNet.Mvc
+NHibernate
+NUnit
+Shouldly
+System.Data.SQLite

@@ -1,0 +1,4 @@
+log4net
+Microsoft.AspNet.Mvc
+SharpZipLib
+System.Data.SQLite

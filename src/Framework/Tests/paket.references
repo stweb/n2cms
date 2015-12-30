@@ -1,0 +1,7 @@
+Castle.Windsor
+log4net
+Microsoft.AspNet.Mvc
+NHibernate
+NUnit
+Shouldly
+System.Data.SQLite

@@ -39,6 +39,30 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="net20\x64\SQLite.Interop.dll">
+      <Paket>True</Paket>
+    </Content>
+    <Content Include="net20\x86\SQLite.Interop.dll">
+      <Paket>True</Paket>
+    </Content>
+    <Content Include="net40\x64\SQLite.Interop.dll">
+      <Paket>True</Paket>
+    </Content>
+    <Content Include="net40\x86\SQLite.Interop.dll">
+      <Paket>True</Paket>
+    </Content>
+    <Content Include="net45\x64\SQLite.Interop.dll">
+      <Paket>True</Paket>
+    </Content>
+    <Content Include="net45\x86\SQLite.Interop.dll">
+      <Paket>True</Paket>
+    </Content>
+    <Content Include="net451\x64\SQLite.Interop.dll">
+      <Paket>True</Paket>
+    </Content>
+    <Content Include="net451\x86\SQLite.Interop.dll">
+      <Paket>True</Paket>
+    </Content>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -166,4 +190,59 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.0' Or $(TargetFrameworkVersion) == 'v4.5' Or $(TargetFrameworkVersion) == 'v4.5.1' Or $(TargetFrameworkVersion) == 'v4.5.2' Or $(TargetFrameworkVersion) == 'v4.5.3' Or $(TargetFrameworkVersion) == 'v4.6' Or $(TargetFrameworkVersion) == 'v4.6.1')">
+      <ItemGroup>
+        <Reference Include="Microsoft.Web.Infrastructure">
+          <HintPath>..\..\..\..\packages\Microsoft.Web.Infrastructure\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.5'">
+      <ItemGroup>
+        <Reference Include="System.Data.SQLite.Linq">
+          <HintPath>..\..\..\..\packages\System.Data.SQLite\lib\net45\System.Data.SQLite.Linq.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+        <Reference Include="System.Data.SQLite">
+          <HintPath>..\..\..\..\packages\System.Data.SQLite\lib\net45\System.Data.SQLite.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.0')">
+      <ItemGroup>
+        <Reference Include="System.Data.SQLite.Linq">
+          <HintPath>..\..\..\..\packages\System.Data.SQLite\lib\net40\System.Data.SQLite.Linq.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+        <Reference Include="System.Data.SQLite">
+          <HintPath>..\..\..\..\packages\System.Data.SQLite\lib\net40\System.Data.SQLite.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.5.1' Or $(TargetFrameworkVersion) == 'v4.5.2' Or $(TargetFrameworkVersion) == 'v4.5.3' Or $(TargetFrameworkVersion) == 'v4.6' Or $(TargetFrameworkVersion) == 'v4.6.1')">
+      <ItemGroup>
+        <Reference Include="System.Data.SQLite.Linq">
+          <HintPath>..\..\..\..\packages\System.Data.SQLite\lib\net451\System.Data.SQLite.Linq.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+        <Reference Include="System.Data.SQLite">
+          <HintPath>..\..\..\..\packages\System.Data.SQLite\lib\net451\System.Data.SQLite.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
 </Project>

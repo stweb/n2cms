@@ -1,6 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{BE953E64-8857-4D08-BFBF-91B0E1F6B2F8}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\..\paket.dependencies = ..\..\..\..\paket.dependencies
+	EndProjectSection
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "N2.Templates.Mvc", "N2.Templates.Mvc.csproj", "{92022CD3-9BDC-4E5B-BB9D-2D47531BEBF1}"
 EndProject
 Global

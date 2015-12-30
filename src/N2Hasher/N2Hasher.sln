@@ -1,6 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{1F6C6C29-B872-49A7-9167-247D2B6356C9}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\paket.dependencies = ..\..\..\paket.dependencies
+		..\paket.dependencies = ..\paket.dependencies
+	EndProjectSection
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "N2Hasher", "N2Hasher.csproj", "{80774AAC-691A-4949-8D85-A0E174C412BD}"
 EndProject
 Global

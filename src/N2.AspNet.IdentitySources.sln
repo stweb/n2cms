@@ -3,12 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "N2.Security.AspNet.Identity", "Framework\N2.Security.AspNet.Identity\N2.Security.AspNet.Identity.csproj", "{4B5FC4F4-9AA8-4A42-B52E-2F287E4A7B2F}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{C0A4DA60-7FB1-406D-936E-0038C6205200}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{3A19A5DF-5764-44EF-9EA8-AA6A7913E764}"
 	ProjectSection(SolutionItems) = preProject
-		.nuget\packages.config = .nuget\packages.config
+		..\..\paket.dependencies = ..\..\paket.dependencies
+		paket.dependencies = paket.dependencies
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "N2.Security.AspNet.Identity", "Framework\N2.Security.AspNet.Identity\N2.Security.AspNet.Identity.csproj", "{4B5FC4F4-9AA8-4A42-B52E-2F287E4A7B2F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "N2", "Framework\N2\N2.csproj", "{F3C813FE-C51B-4C10-85E2-FD2560E73E72}"
 EndProject

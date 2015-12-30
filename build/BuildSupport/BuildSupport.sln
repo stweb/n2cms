@@ -1,6 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{292BE237-61E3-4B72-8B9D-F1CE9B8E608C}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\paket.dependencies = ..\..\..\paket.dependencies
+	EndProjectSection
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildSupport", "BuildSupport.csproj", "{6BB5C546-306D-4810-8482-4A9600F0A4F5}"
 EndProject
 Global
