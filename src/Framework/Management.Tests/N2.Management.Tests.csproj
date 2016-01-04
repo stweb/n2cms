@@ -216,6 +216,7 @@
   </Target>
   -->
   <PropertyGroup>
-    <PreBuildEvent>rmdir /S /Q $(TargetDir)FileSystem\Upload\</PreBuildEvent>
+    <PreBuildEvent Condition=" '$(OS)' == 'Unix' ">rm -rf $(TargetDir)FileSystem/Upload/</PreBuildEvent>
+    <PreBuildEvent Condition=" '$(OS)' != 'Unix' ">rmdir /S /Q $(TargetDir)FileSystem\Upload\</PreBuildEvent>
   </PropertyGroup>
 </Project>
