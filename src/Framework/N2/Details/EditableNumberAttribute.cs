@@ -102,7 +102,11 @@ namespace N2.Details
         public override void UpdateEditor(ContentItem item, Control editor)
         {
             TextBox tb = editor as TextBox;
+#if __MonoCS__ 
+            tb.TextMode = TextBoxMode.SingleLine;
+#else
 			tb.TextMode = TextBoxMode.Number;
+#endif
             object value = item[Name];
             if (value != null)
                 tb.Text = value.ToString();

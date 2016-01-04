@@ -22,11 +22,13 @@ namespace N2.Tests.Definitions
         [SetUp]
         public void SetUp()
         {
-            registration = new ContentRegistration(new DefinitionMap().GetOrCreateDefinition(typeof(EmptyItem)));
+            var map = new DefinitionMap();
+            var def = map.GetOrCreateDefinition(typeof(EmptyItem));
+            registration = new ContentRegistration(def);
         }
 
         [Test]
-        public void RegisteringCheckBox_AddsEditableCheckBox_ToDefinition()
+        public void RegisteringCheckBoxAddsEditableCheckBoxToDefinition()
         {
             registration.CheckBox("Visible", "Show the page in navigation");
 
@@ -40,7 +42,7 @@ namespace N2.Tests.Definitions
         }
 
         [Test]
-        public void RegisteringDateRange_AddsEditableDateRange_ToDefinition()
+        public void RegisteringDateRangeAddsEditableDateRangeToDefinition()
         {
             registration.DateRange("From", "To", "Opening hours");
 
